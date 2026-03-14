@@ -13,7 +13,7 @@ const defaultCard: PlaceCardProps = {
   type: 'Default type'
 } as const;
 
-export function MainScreen({countPages}: MainScreenProps): JSX.Element {
+export function Main({countPages}: MainScreenProps): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <header className="header">

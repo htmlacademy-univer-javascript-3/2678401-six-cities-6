@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM, {Root} from 'react-dom/client';
 import {App} from './App.tsx';
-import {Settings} from './settings.tsx';
+import {Settings} from './Settings.ts';
 
 const root: Root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
