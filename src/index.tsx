@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM, {Root} from 'react-dom/client';
 import {App} from './App.tsx';
-import {Settings} from './Settings.ts';
+import {offers} from './mocks/offers.ts';
 
 const root: Root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -9,6 +9,6 @@ const root: Root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <App countPages={Settings.CountPages}/>
+    <App offers={offers}/>
   </React.StrictMode>
 );

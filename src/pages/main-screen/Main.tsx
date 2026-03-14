@@ -1,28 +1,22 @@
-import {PlaceCard} from '../../components/PlaceCard.tsx';
-import {PlaceCardProps} from '../../components/props/PlaceCardProps.ts';
+import {Link} from 'react-router-dom';
+import {OfferType} from '../../mocks/OfferType.ts';
+import {PlaceCardList} from '../../components/PlaceCardList.tsx';
+import {AppRoute} from '../../const.ts';
 
 type MainScreenProps = {
-  countPages: number;
+  offers: OfferType[];
 }
 
-// mock для шаблона
-const defaultCard: PlaceCardProps = {
-  isPremium: true,
-  price: 800,
-  name: 'Default name',
-  type: 'Default type'
-} as const;
-
-export function Main({countPages}: MainScreenProps): JSX.Element {
+export function Main({offers}: MainScreenProps): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link header__logo-link--active">
+              <Link className="header__logo-link header__logo-link--active" to={AppRoute.Main}>
                 <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width="81" height="41"/>
-              </a>
+              </Link>
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
@@ -103,42 +97,7 @@ export function Main({countPages}: MainScreenProps): JSX.Element {
                   <li className="places__option" tabIndex={0}>Top rated first</li>
                 </ul>
               </form>
-              <div className="cities__places-list places__list tabs__content">
-                <PlaceCard
-                  isPremium
-                  price={120}
-                  name='Beautiful luxurious apartment at great location'
-                  type='Apartment'
-                />
-                <PlaceCard
-                  isPremium={false}
-                  price={80}
-                  name='Wood and stone place'
-                  type='Room'
-                />
-                <PlaceCard
-                  isPremium={false}
-                  price={132}
-                  name='Canal View Prinsengracht'
-                  type='Apartment'
-                />
-                <PlaceCard
-                  isPremium
-                  price={180}
-                  name='Nice, cozy, warm big bed apartment'
-                  type='Apartment'
-                />
-                <PlaceCard
-                  isPremium={false}
-                  price={80}
-                  name='Wood and stone place'
-                  type='Room'
-                />
-
-                {Array.from({ length: countPages }, (_, idx) => (
-                  <PlaceCard key={`offer-${idx}`} {...defaultCard} />
-                ))}
-              </div>
+              <PlaceCardList offers={offers} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map"></section>

@@ -1,0 +1,25 @@
+export type OfferType = {
+  id: string;
+  title: string;
+  type: string;
+  price: number;
+  city: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  isFavorite: boolean;
+  isPremium: boolean;
+  rating: number;
+  description: string;
+  previewImage: string;
+  images: string[];
+  bedrooms: number;
+  maxAdults: number;
+  goods: string[];
+  host: {
+    name: string;
+    avatarUrl: string;
+    isPro: boolean;
+  };
+};
