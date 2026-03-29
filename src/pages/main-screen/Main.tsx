@@ -2,12 +2,28 @@ import {Link} from 'react-router-dom';
 import {OfferType} from '../../mocks/OfferType.ts';
 import {PlaceCardList} from '../../components/PlaceCardList.tsx';
 import {AppRoute} from '../../const.ts';
+import Map from '../../components/Map.tsx';
+import {City, Points} from '../../types.tsx';
 
 type MainScreenProps = {
   offers: OfferType[];
 }
 
 export function Main({offers}: MainScreenProps): JSX.Element {
+
+  const mockCityOffers = offers.filter((offer) => offer.city === 'Amsterdam');
+
+  const mockCity: City = {
+    lat: 52.38,
+    lng: 4.9,
+  };
+
+  const points: Points = mockCityOffers.map((offer) => ({
+    lat: offer.location.latitude,
+    lng: offer.location.longitude,
+    title: offer.title,
+  }));
+
   return (
     <div className="page page--gray page--main">
       <header className="header">
@@ -100,7 +116,11 @@ export function Main({offers}: MainScreenProps): JSX.Element {
               <PlaceCardList offers={offers} />
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map"></section>
+              <Map
+                city={mockCity}
+                points={points}
+                selectedPoint={undefined}
+              />
             </div>
           </div>
         </div>
