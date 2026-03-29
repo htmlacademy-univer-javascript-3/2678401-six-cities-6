@@ -3,10 +3,18 @@ export type OfferType = {
   title: string;
   type: string;
   price: number;
-  city: string;
+  city: {
+    name: string;
+    location: {
+      latitude: number;
+      longitude: number;
+      zoom: number;
+    };
+  };
   location: {
     latitude: number;
     longitude: number;
+    zoom: number;
   };
   isFavorite: boolean;
   isPremium: boolean;
@@ -23,3 +31,4 @@ export type OfferType = {
     isPro: boolean;
   };
 };
+
