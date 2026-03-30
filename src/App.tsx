@@ -6,20 +6,15 @@ import {PrivateRoute} from './PrivateRoute.tsx';
 import {Favorites} from './pages/favorites-screen/Favorites.tsx';
 import {ErrorNotFound} from './pages/ErrorNotFound.tsx';
 import {Offer} from './pages/offer-screen/Offer.tsx';
-import {OfferType} from './mocks/OfferType.ts';
 
-type AppProps = {
-  offers: OfferType[];
-}
-
-export function App({offers}: AppProps): JSX.Element {
+export function App(): JSX.Element {
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path={AppRoute.Main}
           element={
-            <Main offers={offers}/>
+            <Main/>
           }
         />
         <Route
@@ -30,13 +25,13 @@ export function App({offers}: AppProps): JSX.Element {
           path={AppRoute.Favorites}
           element={
             <PrivateRoute authStatus={AuthStatus.NoAuth}>
-              <Favorites offers={offers}/>
+              <Favorites/>
             </PrivateRoute>
           }
         />
         <Route
           path={AppRoute.Offer}
-          element={<Offer offers={offers}/>}
+          element={<Offer/>}
         />
         <Route
           path="*"

@@ -1,22 +1,19 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect} from 'react';
 import {useParams, Link} from 'react-router-dom';
-import {OfferType} from '../../mocks/OfferType.ts';
+import {useSelector} from 'react-redux';
 import {AppRoute} from '../../const.ts';
 import {ReviewForm} from '../../components/ReviewForm.tsx';
-import {City, Point, Points} from '../../types.tsx';
+import {RootState} from '../../store/indexStore.ts';
 
-interface OfferProps {
-  offers: OfferType[];
-}
-
-export function Offer({offers}: OfferProps): JSX.Element {
+export function Offer(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const allOfferList = useSelector((state: RootState) => state.offers);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }, [id]);
 
-  const offer = offers.find((o) => o.id === id);
+  const offer = allOfferList.find((o) => o.id === id);
 
   if (!offer) {
     return (
@@ -29,39 +26,9 @@ export function Offer({offers}: OfferProps): JSX.Element {
 
   const ratingWidth = `${Math.round(offer.rating * 20)}%`;
 
-  const nearOffers = offers
+  const nearOffers = allOfferList
     .filter((o) => o.city === offer.city && o.id !== offer.id)
     .slice(0, 3);
-
-  const mapCity: City = useMemo(() => {
-    if (!offer) {
-      return { lat: 52.38333, lng: 4.9, zoom: 10 };
-    }
-    return {
-      lat: offer.city.location.latitude,
-      lng: offer.city.location.longitude,
-      zoom: offer.city.location.zoom,
-    };
-  }, [offer]);
-
-  const mapPoints: Points = useMemo(() => {
-    if (!offer) {
-      return [];
-    }
-    const allPoints: Point[] = [
-      {
-        lat: offer.location.latitude,
-        lng: offer.location.longitude,
-        title: offer.title,
-      },
-      ...nearOffers.map((nearOffer) => ({
-        lat: nearOffer.location.latitude,
-        lng: nearOffer.location.longitude,
-        title: nearOffer.title,
-      })),
-    ];
-    return allPoints;
-  }, [offer, nearOffers]);
 
   return (
     <div className="page">
@@ -99,8 +66,8 @@ export function Offer({offers}: OfferProps): JSX.Element {
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
               {offer.images.map((image) => (
-                <div key={image} className="offer__image-wrapper">
-                  <img className="offer__image" src={image} alt="Photo studio"/>
+                <div key={`${image}-${offer.id}`} className="offer__image-wrapper">
+                  <img className="offer__image" src={image} alt="Photo studio" />
                 </div>
               ))}
             </div>
@@ -199,11 +166,7 @@ export function Offer({offers}: OfferProps): JSX.Element {
               </section>
             </div>
           </div>
-          {mapPoints.length > 0 && (
-            <section className="offer__map map">
-              <Map city={mapCity} points={mapPoints} selectedPoint={selectedPoint} />
-            </section>
-          )}
+          <section className="offer__map map"></section>
         </section>
         <div className="container">
           <section className="near-places places">

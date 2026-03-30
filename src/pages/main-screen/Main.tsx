@@ -1,28 +1,39 @@
 import {Link} from 'react-router-dom';
-import {OfferType} from '../../mocks/OfferType.ts';
+import {useDispatch, useSelector} from 'react-redux';
 import {PlaceCardList} from '../../components/PlaceCardList.tsx';
-import {AppRoute} from '../../const.ts';
+import {AppRoute, CITY_LIST} from '../../const.ts';
 import Map from '../../components/Map.tsx';
 import {City, Points} from '../../types.tsx';
+import {CityList} from '../../components/CityList.tsx';
+import {changeCity} from '../../store/action.ts';
+import {RootState} from '../../store/indexStore.ts';
 
-type MainScreenProps = {
-  offers: OfferType[];
-}
+export function Main(): JSX.Element {
+  const dispatch = useDispatch();
+  const selectedCity = useSelector((state: RootState) => state.city);
+  const allOfferList = useSelector((state: RootState) => state.offers);
 
-export function Main({offers}: MainScreenProps): JSX.Element {
+  const filteredOfferList = allOfferList.filter((offer) => offer.city === selectedCity);
 
-  const mockCityOffers = offers.filter((offer) => offer.city === 'Amsterdam');
+  const cityCoordinates: City = filteredOfferList[0]
+    ? {
+      lat: filteredOfferList[0].location.latitude,
+      lng: filteredOfferList[0].location.longitude,
+    }
+    : {
+      lat: 52.38,
+      lng: 4.9,
+    };
 
-  const mockCity: City = {
-    lat: 52.38,
-    lng: 4.9,
-  };
-
-  const points: Points = mockCityOffers.map((offer) => ({
+  const points: Points = filteredOfferList.map((offer) => ({
     lat: offer.location.latitude,
     lng: offer.location.longitude,
     title: offer.title,
   }));
+
+  const handleCityChange = (city: string) => {
+    dispatch(changeCity(city));
+  };
 
   return (
     <div className="page page--gray page--main">
@@ -57,47 +68,18 @@ export function Main({offers}: MainScreenProps): JSX.Element {
 
       <main className="page__main page__main--index">
         <h1 className="visually-hidden">Cities</h1>
-        <div className="tabs">
-          <section className="locations container">
-            <ul className="locations__list tabs__list">
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Paris</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Cologne</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Brussels</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item tabs__item--active">
-                  <span>Amsterdam</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Hamburg</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Dusseldorf</span>
-                </a>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <CityList
+          cities={CITY_LIST}
+          selectedCity={selectedCity}
+          onCityChange={handleCityChange}
+        />
         <div className="cities">
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">312 places to stay in Amsterdam</b>
+              <b className="places__found">
+                {filteredOfferList.length} places to stay in {selectedCity}
+              </b>
               <form className="places__sorting" action="#" method="get">
                 <span className="places__sorting-caption">Sort by</span>
                 <span className="places__sorting-type" tabIndex={0}>
@@ -113,11 +95,11 @@ export function Main({offers}: MainScreenProps): JSX.Element {
                   <li className="places__option" tabIndex={0}>Top rated first</li>
                 </ul>
               </form>
-              <PlaceCardList offers={offers} />
+              <PlaceCardList offers={filteredOfferList}/>
             </section>
             <div className="cities__right-section">
               <Map
-                city={mockCity}
+                city={cityCoordinates}
                 points={points}
                 selectedPoint={undefined}
               />

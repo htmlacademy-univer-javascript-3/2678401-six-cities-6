@@ -1,16 +1,15 @@
 import {Link} from 'react-router-dom';
+import {useSelector} from 'react-redux';
 import {OfferType} from '../../mocks/OfferType.ts';
 import {AppRoute} from '../../const.ts';
 import {FavoritePlaceCard} from '../../components/FavoritePlaceCard.tsx';
+import {RootState} from '../../store/indexStore.ts';
 
-interface FavoritesProps {
-  offers: OfferType[];
-}
+export function Favorites(): JSX.Element {
+  const allOfferList = useSelector((state: RootState) => state.offers);
+  const favoriteOfferList = allOfferList.filter((offer) => offer.isFavorite);
 
-export function Favorites({offers}: FavoritesProps): JSX.Element {
-  const favoriteOffers = offers.filter((offer) => offer.isFavorite);
-
-  const groupedByCity = favoriteOffers.reduce((acc, offer) => {
+  const groupedByCity = favoriteOfferList.reduce((acc, offer) => {
     if (!acc[offer.city]) {
       acc[offer.city] = [];
     }
