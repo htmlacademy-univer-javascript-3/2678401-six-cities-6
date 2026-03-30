@@ -30,6 +30,16 @@ export function Offer(): JSX.Element {
     .filter((o) => o.city === offer.city && o.id !== offer.id)
     .slice(0, 3);
 
+  const formatOfferType = (type: string): string => {
+    const typeMap: Record<string, string> = {
+      apartment: 'Apartment',
+      room: 'Room',
+      house: 'House',
+      hotel: 'Hotel',
+    };
+    return typeMap[type] || type;
+  };
+
   return (
     <div className="page">
       <header className="header">
@@ -74,12 +84,14 @@ export function Offer(): JSX.Element {
           </div>
           <div className="offer__container container">
             <div className="offer__wrapper">
-              <div className="offer__mark">
-                <span>Premium</span>
-              </div>
+              {offer.isPremium && (
+                <div className="offer__mark">
+                  <span>Premium</span>
+                </div>
+              )}
               <div className="offer__name-wrapper">
                 <h1 className="offer__name">
-                  Beautiful &amp; luxurious studio at great location
+                  {offer.title}
                 </h1>
                 <button className={`offer__bookmark-button button ${offer.isFavorite ? 'place-card__bookmark-button--active' : ''}`} type="button">
                   <svg className="offer__bookmark-icon" width="31" height="33">
@@ -97,14 +109,18 @@ export function Offer(): JSX.Element {
               </div>
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
-                  {offer.type}
+                  {formatOfferType(offer.type)}
                 </li>
-                <li className="offer__feature offer__feature--bedrooms">
-                  {offer.bedrooms} {offer.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
-                </li>
-                <li className="offer__feature offer__feature--adults">
-                  Max {offer.maxAdults} {offer.maxAdults === 1 ? 'adult' : 'adults'}
-                </li>
+                {offer.bedrooms !== undefined && (
+                  <li className="offer__feature offer__feature--bedrooms">
+                    {offer.bedrooms} {offer.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}
+                  </li>
+                )}
+                {offer.maxAdults !== undefined && (
+                  <li className="offer__feature offer__feature--adults">
+                    Max {offer.maxAdults} {offer.maxAdults === 1 ? 'adult' : 'adults'}
+                  </li>
+                )}
               </ul>
               <div className="offer__price">
                 <b className="offer__price-value">&euro;{offer.price}</b>
@@ -168,7 +184,7 @@ export function Offer(): JSX.Element {
                     </div>
                   </li>
                 </ul>
-                <ReviewForm />
+                <ReviewForm/>
               </section>
             </div>
           </div>
