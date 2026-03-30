@@ -1,3 +1,4 @@
+import {memo, useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {OfferType} from '../domain/dto/offer.ts';
 
@@ -5,9 +6,8 @@ interface FavoriteCardProps {
   offer: OfferType;
 }
 
-export function FavoritePlaceCard({offer}: FavoriteCardProps): JSX.Element {
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
-
+function FavoritePlaceCardComponent({offer}: FavoriteCardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
   return (
     <article className="favorites__card place-card">
       {offer.isPremium ? (
@@ -47,3 +47,6 @@ export function FavoritePlaceCard({offer}: FavoriteCardProps): JSX.Element {
     </article>
   );
 }
+
+const FavoritePlaceCard = memo(FavoritePlaceCardComponent);
+export default FavoritePlaceCard;

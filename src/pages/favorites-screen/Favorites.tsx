@@ -3,11 +3,11 @@ import {Link} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {OfferType} from '../../domain/dto/offer.ts';
 import {AppRoute} from '../../const.ts';
-import {FavoritePlaceCard} from '../../components/FavoritePlaceCard.tsx';
-import {RootState} from '../../store/indexStore.ts';
+import {getAllOffers} from '../../store/selectors.tsx';
+import FavoritePlaceCard from '../../components/FavoritePlaceCard.tsx';
 
 export function Favorites(): JSX.Element {
-  const allOfferList = useSelector((state: RootState) => state.offers);
+  const allOfferList = useSelector(getAllOffers);
 
   const groupedByCity = useMemo(() => {
     const favoriteOffers = allOfferList.filter((offer) => offer.isFavorite);

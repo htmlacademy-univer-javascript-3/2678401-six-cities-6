@@ -7,7 +7,8 @@ export enum AppRoute {
 
 export enum AuthStatus {
   Auth = 'AUTH',
-  NoAuth = 'NO_AUTH'
+  NoAuth = 'NO_AUTH',
+  Unknown = 'UNKNOWN'
 }
 
 export const URL_MARKER_DEFAULT = 'img/pin.svg';

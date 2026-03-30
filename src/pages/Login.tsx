@@ -1,14 +1,15 @@
 import {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../store/indexStore.ts';
+import {AppDispatch} from '../store/indexStore.ts';
 import {AppRoute, AuthStatus} from '../const.ts';
 import {loginAction} from '../store/action.ts';
+import {getAuthorizationStatus} from '../store/selectors.tsx';
 
 export function Login(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const authStatus = useSelector((state: RootState) => state.authStatus);
+  const authStatus = useSelector(getAuthorizationStatus);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

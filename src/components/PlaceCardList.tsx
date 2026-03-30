@@ -1,16 +1,17 @@
-import {useEffect, useState} from 'react';
+import {useCallback} from 'react';
 import {OfferType} from '../domain/dto/offer.ts';
-import {PlaceCard} from './PlaceCard.tsx';
+import PlaceCard from './PlaceCard.tsx';
 
 interface OffersListProps {
   offers: OfferType[];
 }
 
 export function PlaceCardList({offers}: OffersListProps): JSX.Element {
-  const [activeCard, setActiveCard] = useState<string | null>(null);
+  const handleMouseEnter = useCallback(() => {
+  }, []);
 
-  useEffect(() => {
-  }, [activeCard]);
+  const handleMouseLeave = useCallback(() => {
+  }, []);
 
   return (
     <div className="cities__places-list places__list tabs__content">
@@ -18,8 +19,8 @@ export function PlaceCardList({offers}: OffersListProps): JSX.Element {
         <PlaceCard
           key={offer.id}
           offer={offer}
-          onMouseEnter={() => setActiveCard(offer.id)}
-          onMouseExit={() => setActiveCard(null)}
+          onMouseEnter={handleMouseEnter}
+          onMouseExit={handleMouseLeave}
         />
       ))}
     </div>

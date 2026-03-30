@@ -1,3 +1,4 @@
+import {memo, useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {OfferType} from '../domain/dto/offer.ts';
 
@@ -7,9 +8,8 @@ export type PlaceCardProps = {
   onMouseExit?: () => void;
 }
 
-export function PlaceCard({offer, onMouseEnter, onMouseExit}: PlaceCardProps): JSX.Element {
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
-
+function PlaceCardComponent({offer, onMouseEnter, onMouseExit}: PlaceCardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
   return (
     <article className="cities__card place-card"
       onMouseEnter={onMouseEnter}
@@ -57,3 +57,6 @@ export function PlaceCard({offer, onMouseEnter, onMouseExit}: PlaceCardProps): J
     </article>
   );
 }
+
+const PlaceCard = memo(PlaceCardComponent);
+export default PlaceCard;

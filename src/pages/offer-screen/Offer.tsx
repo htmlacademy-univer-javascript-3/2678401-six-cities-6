@@ -1,34 +1,30 @@
-import {useEffect} from 'react';
+import {useEffect, useMemo} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {AppRoute} from '../../const.ts';
 import {ReviewForm} from '../../components/ReviewForm.tsx';
-import {RootState} from '../../store/indexStore.ts';
+import {getAllOffers} from '../../store/selectors.tsx';
 
 export function Offer(): JSX.Element {
   const { id } = useParams<{ id: string }>();
-  const allOfferList = useSelector((state: RootState) => state.offers);
+  const allOfferList = useSelector(getAllOffers);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }, [id]);
 
-  const offer = allOfferList.find((o) => o.id === id);
+  const offer = useMemo(() => allOfferList.find((o) => o.id === id), [allOfferList, id]);
 
-  if (!offer) {
-    return (
-      <div className="page">
-        <h1>Offer not found</h1>
-        <Link to={AppRoute.Main}>Back on Main</Link>
-      </div>
-    );
-  }
+  const ratingWidth = useMemo(() => offer ? `${Math.round(offer.rating * 20)}%` : '0%', [offer]);
 
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
-
-  const nearOffers = allOfferList
-    .filter((o) => o.city === offer.city && o.id !== offer.id)
-    .slice(0, 3);
+  const nearOffers = useMemo(() => {
+    if (!offer) {
+      return [];
+    }
+    return allOfferList
+      .filter((o) => o.city.name === offer.city.name && o.id !== offer.id)
+      .slice(0, 3);
+  }, [allOfferList, offer]);
 
   const formatOfferType = (type: string): string => {
     const typeMap: Record<string, string> = {
@@ -39,6 +35,15 @@ export function Offer(): JSX.Element {
     };
     return typeMap[type] || type;
   };
+
+  if (!offer) {
+    return (
+      <div className="page">
+        <h1>Offer not found</h1>
+        <Link to={AppRoute.Main}>Back on Main</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="page">

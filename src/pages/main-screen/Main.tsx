@@ -5,21 +5,29 @@ import {PlaceCardList} from '../../components/PlaceCardList.tsx';
 import {AppRoute, AuthStatus, CITY_LIST, SortType} from '../../const.ts';
 import Map from '../../components/Map.tsx';
 import {City, Points} from '../../types.tsx';
-import {CityList} from '../../components/CityList.tsx';
-import {changeCity, fetchOffersAction, logout} from '../../store/action.ts';
-import {AppDispatch, RootState} from '../../store/indexStore.ts';
+import CityList from '../../components/CityList.tsx';
+import {changeCity, fetchOffersAction, logoutAction} from '../../store/action.ts';
+import {AppDispatch} from '../../store/indexStore.ts';
 import Spinner from '../../components/Spinner.tsx';
 import ExceptionMessage from '../../components/ExceptionMessage.tsx';
+import {OfferType} from '../../domain/dto/offer.ts';
+import {
+  getAuthorizationStatus, getFavoriteOffersCount,
+  getFilteredOffers,
+  getOffersError,
+  getOffersLoadingStatus,
+  getSelectedCity, getUser
+} from '../../store/selectors.tsx';
 
 export function Main(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
-  const selectedCity = useSelector((state: RootState) => state.city);
-  const allOfferList = useSelector((state: RootState) => state.offers);
-  const filteredOfferList = allOfferList.filter((offer) => offer.city.name === selectedCity);
-  const isOffersDataLoading = useSelector((state: RootState) => state.isOffersDataLoading);
-  const offersDataError = useSelector((state: RootState) => state.offersDataError);
-  const authStatus = useSelector((state: RootState) => state.authStatus);
-  const user = useSelector((state: RootState) => state.user);
+  const selectedCity = useSelector(getSelectedCity);
+  const filteredOfferList = useSelector(getFilteredOffers);
+  const isOffersDataLoading = useSelector(getOffersLoadingStatus);
+  const offersDataError = useSelector(getOffersError);
+  const authStatus = useSelector(getAuthorizationStatus);
+  const user = useSelector(getUser);
+  const favoriteOffersCount = useSelector(getFavoriteOffersCount);
 
   const [sortType, setSortType] = useState<SortType>('Popular');
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
@@ -39,7 +47,7 @@ export function Main(): JSX.Element {
     }
   }, [filteredOfferList, sortType]);
 
-  const cityCoordinates: City = sortedOfferList[0]
+  const cityCoordinates: City = useMemo(() => sortedOfferList[0]
     ? {
       lat: sortedOfferList[0].city.location.latitude,
       lng: sortedOfferList[0].city.location.longitude,
@@ -49,26 +57,25 @@ export function Main(): JSX.Element {
       lat: 52.38333,
       lng: 4.9,
       zoom: 10,
-    };
+    }, [sortedOfferList]);
 
-  const points: Points = sortedOfferList.map((offer) => ({
+  const points: Points = useMemo(() => sortedOfferList.map((offer: OfferType) => ({
     lat: offer.location.latitude,
     lng: offer.location.longitude,
     title: offer.title,
-    id: offer.id,
-  }));
+  })), [sortedOfferList]);
 
   useEffect(() => {
     dispatch(fetchOffersAction());
   }, [dispatch]);
 
-  const handleCityChange = (city: string) => {
+  const handleCityChange = useCallback((city: string) => {
     dispatch(changeCity(city));
-  };
+  }, [dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const handleLogout = useCallback(() => {
+    dispatch(logoutAction());
+  }, [dispatch]);
 
   const handleSortTypeChange = useCallback((newSortType: SortType) => {
     setSortType(newSortType);
@@ -103,7 +110,7 @@ export function Main(): JSX.Element {
                           <img className="header__avatar user__avatar" src={user.avatarUrl} alt={user.name} width="20" height="20" />
                         </div>
                         <span className="header__user-name user__name">{user.email}</span>
-                        <span className="header__favorite-count">{allOfferList.filter((offer) => offer.isFavorite).length}</span>
+                        <span className="header__favorite-count">{favoriteOffersCount}</span>
                       </Link>
                     </li>
                     <li className="header__nav-item">
@@ -146,7 +153,6 @@ export function Main(): JSX.Element {
                 <Spinner/>
               )}
               {!offersDataError && !isOffersDataLoading && (
-
                 <>
                   <b className="places__found">
                     {sortedOfferList.length} places to stay in {selectedCity}
