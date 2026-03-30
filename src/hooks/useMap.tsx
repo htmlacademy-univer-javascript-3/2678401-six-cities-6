@@ -13,7 +13,7 @@ export function useMap(mapRef: MutableRefObject<HTMLElement | null>, city: City)
           lat: city.lat,
           lng: city.lng
         },
-        zoom: 10,
+        zoom: city.zoom ?? 10
       });
 
       const layer = new TileLayer(
@@ -30,6 +30,15 @@ export function useMap(mapRef: MutableRefObject<HTMLElement | null>, city: City)
       isRenderedRef.current = true;
     }
   }, [mapRef, city]);
+
+  useEffect(() => {
+    if (map) {
+      map.setView(
+        [city.lat, city.lng],
+        city.zoom ?? 10
+      );
+    }
+  }, [map, city]);
 
   return map;
 }

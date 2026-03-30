@@ -19,13 +19,13 @@ export type OfferType = {
   isFavorite: boolean;
   isPremium: boolean;
   rating: number;
-  description: string;
+  description?: string;
   previewImage: string;
-  images: string[];
-  bedrooms: number;
-  maxAdults: number;
-  goods: string[];
-  host: {
+  images?: string[];
+  bedrooms?: number;
+  maxAdults?: number;
+  goods?: string[];
+  host?: {
     name: string;
     avatarUrl: string;
     isPro: boolean;

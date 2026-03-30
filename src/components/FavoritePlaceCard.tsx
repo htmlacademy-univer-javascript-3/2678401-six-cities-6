@@ -1,11 +1,11 @@
 import {Link} from 'react-router-dom';
-import {OfferType} from '../mocks/OfferType.ts';
+import {OfferType} from '../offer.ts';
 
 interface FavoriteCardProps {
   offer: OfferType;
 }
 
-export function FavoritePlaceCard({ offer }: FavoriteCardProps): JSX.Element {
+export function FavoritePlaceCard({offer}: FavoriteCardProps): JSX.Element {
   const ratingWidth = `${Math.round(offer.rating * 20)}%`;
 
   return (
@@ -17,7 +17,7 @@ export function FavoritePlaceCard({ offer }: FavoriteCardProps): JSX.Element {
       ) : undefined}
       <div className="favorites__image-wrapper place-card__image-wrapper">
         <Link to={`/offer/${offer.id}`}>
-          <img className="place-card__image" src={offer.previewImage} width="150" height="110" alt="Place image" />
+          <img className="place-card__image" src={offer.previewImage} width="150" height="110" alt="Place image"/>
         </Link>
       </div>
       <div className="favorites__card-info place-card__info">
@@ -35,7 +35,7 @@ export function FavoritePlaceCard({ offer }: FavoriteCardProps): JSX.Element {
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span style={{ width: ratingWidth }}></span>
+            <span style={{width: ratingWidth}}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>

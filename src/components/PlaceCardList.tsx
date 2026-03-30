@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react';
-import {OfferType} from '../mocks/OfferType.ts';
+import {OfferType} from '../offer.ts';
 import {PlaceCard} from './PlaceCard.tsx';
 
 interface OffersListProps {
   offers: OfferType[];
 }
 
-export function PlaceCardList({ offers }: OffersListProps): JSX.Element {
+export function PlaceCardList({offers}: OffersListProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
   useEffect(() => {

@@ -1,15 +1,19 @@
 import {createReducer} from '@reduxjs/toolkit';
-import {OfferType} from '../mocks/OfferType.ts';
-import {changeCity, loadOffers} from './action.ts';
+import {OfferType} from '../offer.ts';
+import {changeCity, loadOffers, setOffersDataError, setOffersDataLoading} from './action.ts';
 
 interface State {
   city: string;
   offers: OfferType[];
+  isOffersDataLoading: boolean;
+  offersDataError: string | null;
 }
 
 const initialState: State = {
   city: 'Paris',
   offers: [],
+  isOffersDataLoading: false,
+  offersDataError: null,
 };
 
 export const reducerApp = createReducer(initialState, (builder) => {
@@ -19,5 +23,11 @@ export const reducerApp = createReducer(initialState, (builder) => {
     })
     .addCase(loadOffers, (state, action) => {
       state.offers = action.payload;
+    })
+    .addCase(setOffersDataLoading, (state, action) => {
+      state.isOffersDataLoading = action.payload;
+    })
+    .addCase(setOffersDataError, (state, action) => {
+      state.offersDataError = action.payload;
     });
 });

@@ -1,4 +1,4 @@
-import {useState, useMemo, useCallback} from 'react';
+import {useState, useMemo, useCallback, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {PlaceCardList} from '../../components/PlaceCardList.tsx';
@@ -6,14 +6,18 @@ import {AppRoute, CITY_LIST, SortType} from '../../const.ts';
 import Map from '../../components/Map.tsx';
 import {City, Points} from '../../types.tsx';
 import {CityList} from '../../components/CityList.tsx';
-import {changeCity} from '../../store/action.ts';
-import {RootState} from '../../store/indexStore.ts';
+import {changeCity, fetchOffersAction} from '../../store/action.ts';
+import {AppDispatch, RootState} from '../../store/indexStore.ts';
+import Spinner from '../../components/Spinner.tsx';
+import ExceptionMessage from '../../components/ExceptionMessage.tsx';
 
 export function Main(): JSX.Element {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const selectedCity = useSelector((state: RootState) => state.city);
   const allOfferList = useSelector((state: RootState) => state.offers);
   const filteredOfferList = allOfferList.filter((offer) => offer.city.name === selectedCity);
+  const isOffersDataLoading = useSelector((state: RootState) => state.isOffersDataLoading);
+  const offersDataError = useSelector((state: RootState) => state.offersDataError);
 
   const [sortType, setSortType] = useState<SortType>('Popular');
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
@@ -51,6 +55,10 @@ export function Main(): JSX.Element {
     title: offer.title,
     id: offer.id,
   }));
+
+  useEffect(() => {
+    dispatch(fetchOffersAction());
+  }, [dispatch]);
 
   const handleCityChange = (city: string) => {
     dispatch(changeCity(city));
@@ -111,65 +119,78 @@ export function Main(): JSX.Element {
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">
-                {sortedOfferList.length} places to stay in {selectedCity}
-              </b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by</span>
-                <span
-                  className="places__sorting-type"
-                  tabIndex={0}
-                  onClick={handleSortMenuToggle}
-                  onBlur={handleSortMenuClose}
-                >{sortType}
-                  <svg className="places__sorting-arrow" width="7" height="4">
-                    <use href="#icon-arrow-select"></use>
-                  </svg>
-                </span>
-                <ul className={`places__options places__options--custom ${isSortMenuOpen ? 'places__options--opened' : ''}`}>
-                  <li
-                    className={`places__option ${sortType === 'Popular' ? 'places__option--active' : ''}`}
-                    tabIndex={0}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleSortTypeChange('Popular');
-                    }}
-                  >
-                    Popular
-                  </li>
-                  <li
-                    className={`places__option ${sortType === 'Price: low to high' ? 'places__option--active' : ''}`}
-                    tabIndex={0}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleSortTypeChange('Price: low to high');
-                    }}
-                  >
-                    Price: low to high
-                  </li>
-                  <li
-                    className={`places__option ${sortType === 'Price: high to low' ? 'places__option--active' : ''}`}
-                    tabIndex={0}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleSortTypeChange('Price: high to low');
-                    }}
-                  >
-                    Price: high to low
-                  </li>
-                  <li
-                    className={`places__option ${sortType === 'Top rated first' ? 'places__option--active' : ''}`}
-                    tabIndex={0}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleSortTypeChange('Top rated first');
-                    }}
-                  >
-                    Top rated first
-                  </li>
-                </ul>
-              </form>
-              <PlaceCardList offers={sortedOfferList}/>
+              {offersDataError && (
+                <ExceptionMessage message={offersDataError}/>
+              )}
+              {!offersDataError && isOffersDataLoading && (
+                <Spinner/>
+              )}
+              {!offersDataError && !isOffersDataLoading && (
+
+                <>
+                  <b className="places__found">
+                    {sortedOfferList.length} places to stay in {selectedCity}
+                  </b>
+                  <form className="places__sorting" action="#" method="get">
+                    <span className="places__sorting-caption">Sort by</span>
+                    <span
+                      className="places__sorting-type"
+                      tabIndex={0}
+                      onClick={handleSortMenuToggle}
+                      onBlur={handleSortMenuClose}
+                    >{sortType}
+                      <svg className="places__sorting-arrow" width="7" height="4">
+                        <use href="#icon-arrow-select"></use>
+                      </svg>
+                    </span>
+                    <ul
+                      className={`places__options places__options--custom ${isSortMenuOpen ? 'places__options--opened' : ''}`}
+                    >
+                      <li
+                        className={`places__option ${sortType === 'Popular' ? 'places__option--active' : ''}`}
+                        tabIndex={0}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSortTypeChange('Popular');
+                        }}
+                      >
+                        Popular
+                      </li>
+                      <li
+                        className={`places__option ${sortType === 'Price: low to high' ? 'places__option--active' : ''}`}
+                        tabIndex={0}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSortTypeChange('Price: low to high');
+                        }}
+                      >
+                        Price: low to high
+                      </li>
+                      <li
+                        className={`places__option ${sortType === 'Price: high to low' ? 'places__option--active' : ''}`}
+                        tabIndex={0}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSortTypeChange('Price: high to low');
+                        }}
+                      >
+                        Price: high to low
+                      </li>
+                      <li
+                        className={`places__option ${sortType === 'Top rated first' ? 'places__option--active' : ''}`}
+                        tabIndex={0}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSortTypeChange('Top rated first');
+                        }}
+                      >
+                        Top rated first
+                      </li>
+                    </ul>
+                  </form>
+                  <PlaceCardList offers={sortedOfferList}/>
+                </>
+              )}
             </section>
             <div className="cities__right-section">
               <Map
