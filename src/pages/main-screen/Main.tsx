@@ -1,7 +1,8 @@
+import {useState, useMemo, useCallback} from 'react';
 import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {PlaceCardList} from '../../components/PlaceCardList.tsx';
-import {AppRoute, CITY_LIST} from '../../const.ts';
+import {AppRoute, CITY_LIST, SortType} from '../../const.ts';
 import Map from '../../components/Map.tsx';
 import {City, Points} from '../../types.tsx';
 import {CityList} from '../../components/CityList.tsx';
@@ -12,28 +13,61 @@ export function Main(): JSX.Element {
   const dispatch = useDispatch();
   const selectedCity = useSelector((state: RootState) => state.city);
   const allOfferList = useSelector((state: RootState) => state.offers);
+  const filteredOfferList = allOfferList.filter((offer) => offer.city.name === selectedCity);
 
-  const filteredOfferList = allOfferList.filter((offer) => offer.city === selectedCity);
+  const [sortType, setSortType] = useState<SortType>('Popular');
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
-  const cityCoordinates: City = filteredOfferList[0]
+  const sortedOfferList = useMemo(() => {
+    const offerList = [...filteredOfferList];
+    switch (sortType) {
+      case 'Price: low to high':
+        return offerList.sort((a, b) => a.price - b.price);
+      case 'Price: high to low':
+        return offerList.sort((a, b) => b.price - a.price);
+      case 'Top rated first':
+        return offerList.sort((a, b) => b.rating - a.rating);
+      case 'Popular':
+      default:
+        return offerList;
+    }
+  }, [filteredOfferList, sortType]);
+
+  const cityCoordinates: City = sortedOfferList[0]
     ? {
-      lat: filteredOfferList[0].location.latitude,
-      lng: filteredOfferList[0].location.longitude,
+      lat: sortedOfferList[0].city.location.latitude,
+      lng: sortedOfferList[0].city.location.longitude,
+      zoom: sortedOfferList[0].city.location.zoom,
     }
     : {
-      lat: 52.38,
+      lat: 52.38333,
       lng: 4.9,
+      zoom: 10,
     };
 
-  const points: Points = filteredOfferList.map((offer) => ({
+  const points: Points = sortedOfferList.map((offer) => ({
     lat: offer.location.latitude,
     lng: offer.location.longitude,
     title: offer.title,
+    id: offer.id,
   }));
 
   const handleCityChange = (city: string) => {
     dispatch(changeCity(city));
   };
+
+  const handleSortTypeChange = useCallback((newSortType: SortType) => {
+    setSortType(newSortType);
+    setIsSortMenuOpen(false);
+  }, []);
+
+  const handleSortMenuToggle = useCallback(() => {
+    setIsSortMenuOpen((prev) => !prev);
+  }, []);
+
+  const handleSortMenuClose = useCallback(() => {
+    setIsSortMenuOpen(false);
+  }, []);
 
   return (
     <div className="page page--gray page--main">
@@ -78,24 +112,64 @@ export function Main(): JSX.Element {
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
               <b className="places__found">
-                {filteredOfferList.length} places to stay in {selectedCity}
+                {sortedOfferList.length} places to stay in {selectedCity}
               </b>
               <form className="places__sorting" action="#" method="get">
                 <span className="places__sorting-caption">Sort by</span>
-                <span className="places__sorting-type" tabIndex={0}>
-                  Popular
+                <span
+                  className="places__sorting-type"
+                  tabIndex={0}
+                  onClick={handleSortMenuToggle}
+                  onBlur={handleSortMenuClose}
+                >{sortType}
                   <svg className="places__sorting-arrow" width="7" height="4">
-                    <use xlinkHref="#icon-arrow-select"></use>
+                    <use href="#icon-arrow-select"></use>
                   </svg>
                 </span>
-                <ul className="places__options places__options--custom places__options--opened">
-                  <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                  <li className="places__option" tabIndex={0}>Price: low to high</li>
-                  <li className="places__option" tabIndex={0}>Price: high to low</li>
-                  <li className="places__option" tabIndex={0}>Top rated first</li>
+                <ul className={`places__options places__options--custom ${isSortMenuOpen ? 'places__options--opened' : ''}`}>
+                  <li
+                    className={`places__option ${sortType === 'Popular' ? 'places__option--active' : ''}`}
+                    tabIndex={0}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSortTypeChange('Popular');
+                    }}
+                  >
+                    Popular
+                  </li>
+                  <li
+                    className={`places__option ${sortType === 'Price: low to high' ? 'places__option--active' : ''}`}
+                    tabIndex={0}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSortTypeChange('Price: low to high');
+                    }}
+                  >
+                    Price: low to high
+                  </li>
+                  <li
+                    className={`places__option ${sortType === 'Price: high to low' ? 'places__option--active' : ''}`}
+                    tabIndex={0}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSortTypeChange('Price: high to low');
+                    }}
+                  >
+                    Price: high to low
+                  </li>
+                  <li
+                    className={`places__option ${sortType === 'Top rated first' ? 'places__option--active' : ''}`}
+                    tabIndex={0}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSortTypeChange('Top rated first');
+                    }}
+                  >
+                    Top rated first
+                  </li>
                 </ul>
               </form>
-              <PlaceCardList offers={filteredOfferList}/>
+              <PlaceCardList offers={sortedOfferList}/>
             </section>
             <div className="cities__right-section">
               <Map

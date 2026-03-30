@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {Link} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {OfferType} from '../../mocks/OfferType.ts';
@@ -7,15 +8,18 @@ import {RootState} from '../../store/indexStore.ts';
 
 export function Favorites(): JSX.Element {
   const allOfferList = useSelector((state: RootState) => state.offers);
-  const favoriteOfferList = allOfferList.filter((offer) => offer.isFavorite);
 
-  const groupedByCity = favoriteOfferList.reduce((acc, offer) => {
-    if (!acc[offer.city]) {
-      acc[offer.city] = [];
-    }
-    acc[offer.city].push(offer);
-    return acc;
-  }, {} as Record<string, OfferType[]>);
+  const groupedByCity = useMemo(() => {
+    const favoriteOffers = allOfferList.filter((offer) => offer.isFavorite);
+    return favoriteOffers.reduce((acc, offer) => {
+      const cityName = offer.city.name;
+      if (!acc[cityName]) {
+        acc[cityName] = [];
+      }
+      acc[cityName].push(offer);
+      return acc;
+    }, {} as Record<string, OfferType[]>);
+  }, [allOfferList]);
 
   return (
     <div className="page">
