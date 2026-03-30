@@ -9,6 +9,8 @@ type MapProps = {
   city: City;
   points: Points;
   selectedPoint: Point | undefined;
+  onMarkerMouseEnter?: (point: Point) => void;
+  onMarkerMouseLeave?: () => void;
 };
 
 const defaultCustomIcon = new Icon({
@@ -24,7 +26,7 @@ const currentCustomIcon = new Icon({
 });
 
 export default function Map(props: MapProps): JSX.Element {
-  const {city, points, selectedPoint} = props;
+  const {city, points, selectedPoint, onMarkerMouseEnter, onMarkerMouseLeave} = props;
 
   const mapRef = useRef(null);
   const map = useMap(mapRef, city);
@@ -38,20 +40,36 @@ export default function Map(props: MapProps): JSX.Element {
           lng: point.lng
         });
 
+        const isSelected = selectedPoint !== undefined &&
+          point.lat === selectedPoint.lat &&
+          point.lng === selectedPoint.lng;
+
         marker
           .setIcon(
-            selectedPoint !== undefined && point.title === selectedPoint.title
+            isSelected
               ? currentCustomIcon
               : defaultCustomIcon
           )
           .addTo(markerLayer);
+
+        if (onMarkerMouseEnter) {
+          marker.on('mouseover', () => {
+            onMarkerMouseEnter(point);
+          });
+        }
+
+        if (onMarkerMouseLeave) {
+          marker.on('mouseout', () => {
+            onMarkerMouseLeave();
+          });
+        }
       });
 
       return () => {
         map.removeLayer(markerLayer);
       };
     }
-  }, [map, points, selectedPoint]);
+  }, [map, points, selectedPoint, onMarkerMouseEnter, onMarkerMouseLeave]);
 
-  return <div className="cities__map map" ref={mapRef}></div>;
+  return <div style={{ height: '100%', width: '100%', minHeight: '500px' }} className="cities__map map" ref={mapRef}></div>;
 }

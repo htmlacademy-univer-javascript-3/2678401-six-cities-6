@@ -1,5 +1,5 @@
 import {createReducer} from '@reduxjs/toolkit';
-import {loadOffers, setOffersDataError, setOffersDataLoading} from '../action.ts';
+import {loadOffers, setOffersDataError, setOffersDataLoading, updateOffer, updateOfferFavorite} from '../action.ts';
 import {OfferType} from '../../domain/dto/offer.ts';
 
 interface OffersState {
@@ -24,6 +24,20 @@ const offerProcess = createReducer(initialState, (builder) => {
     })
     .addCase(setOffersDataError, (state, action) => {
       state.offersDataError = action.payload;
+    })
+    .addCase(updateOfferFavorite, (state, action) => {
+      const offer = state.offers.find((o) => o.id === action.payload.id);
+      if (offer) {
+        offer.isFavorite = action.payload.isFavorite;
+      }
+    })
+    .addCase(updateOffer, (state, action) => {
+      const index = state.offers.findIndex((o) => o.id === action.payload.id);
+      if (index !== -1) {
+        state.offers[index] = action.payload;
+      } else {
+        state.offers.push(action.payload);
+      }
     });
 });
 

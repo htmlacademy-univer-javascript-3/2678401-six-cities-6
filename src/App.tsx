@@ -5,7 +5,7 @@ import {Login} from './pages/Login.tsx';
 import {PrivateRoute} from './PrivateRoute.tsx';
 import {Favorites} from './pages/favorites-screen/Favorites.tsx';
 import {ErrorNotFound} from './pages/ErrorNotFound.tsx';
-import {Offer} from './pages/offer-screen/Offer.tsx';
+import Offer from './pages/offer-screen/Offer.tsx';
 
 export function App(): JSX.Element {
   return (

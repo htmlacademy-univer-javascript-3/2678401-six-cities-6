@@ -33,10 +33,14 @@ export function useMap(mapRef: MutableRefObject<HTMLElement | null>, city: City)
 
   useEffect(() => {
     if (map) {
-      map.setView(
-        [city.lat, city.lng],
-        city.zoom ?? 10
-      );
+      try {
+        map.setView(
+          [city.lat, city.lng],
+          city.zoom ?? 10
+        );
+      } catch {
+        // todo
+      }
     }
   }, [map, city]);
 

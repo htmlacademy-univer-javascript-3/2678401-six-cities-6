@@ -5,15 +5,17 @@ import {OfferType} from '../domain/dto/offer.ts';
 export type PlaceCardProps = {
   offer: OfferType;
   onMouseEnter?: () => void;
-  onMouseExit?: () => void;
+  onMouseLeave?: () => void;
+  onFavoriteClick?: (offerId: string) => void;
+  isSelected?: boolean;
 }
 
-function PlaceCardComponent({offer, onMouseEnter, onMouseExit}: PlaceCardProps): JSX.Element {
-  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
+function PlaceCardComponent({offer, onMouseEnter, onMouseLeave, onFavoriteClick, isSelected}: PlaceCardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating) * 20}%`, [offer.rating]);
   return (
-    <article className="cities__card place-card"
+    <article className={`cities__card place-card ${isSelected ? 'place-card--selected' : ''}`}
       onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseExit}
+      onMouseLeave={onMouseLeave}
     >
       {offer.isPremium ? (
         <div className="place-card__mark">
@@ -36,6 +38,10 @@ function PlaceCardComponent({offer, onMouseEnter, onMouseExit}: PlaceCardProps):
           <button
             className={`place-card__bookmark-button button ${offer.isFavorite ? 'place-card__bookmark-button--active' : ''}`}
             type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onFavoriteClick?.(offer.id);
+            }}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>

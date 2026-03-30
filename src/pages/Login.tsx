@@ -1,10 +1,10 @@
-import {ChangeEvent, FormEvent, useEffect, useState} from 'react';
+import {ChangeEvent, FormEvent, useEffect, useMemo, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../store/indexStore.ts';
-import {AppRoute, AuthStatus} from '../const.ts';
-import {loginAction} from '../store/action.ts';
-import {getAuthorizationStatus} from '../store/selectors.tsx';
+import {AppRoute, AuthStatus, CITY_LIST} from '../const.ts';
+import {changeCity, loginAction} from '../store/action.ts';
+import {getAuthorizationStatus} from '../store/selectors.ts';
 
 export function Login(): JSX.Element {
   const navigate = useNavigate();
@@ -32,12 +32,31 @@ export function Login(): JSX.Element {
     setError(null);
   };
 
+  const randomCity = useMemo(() => CITY_LIST[Math.floor(Math.random() * CITY_LIST.length)], []);
+
+  const validatePassword = (pwd: string): boolean => {
+    const hasLetter = /[a-zA-Z]/.test(pwd);
+    const hasDigit = /\d/.test(pwd);
+    return hasLetter && hasDigit;
+  };
+
+  const handleQuickCityClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
+    evt.preventDefault();
+    dispatch(changeCity(randomCity));
+    navigate(AppRoute.Main);
+  };
+
   const handleSubmit = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     setError(null);
 
     if (password.trim().length === 0) {
       setError('Password cannot be empty or contain only spaces');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError('Password must contain at least one letter and one digit');
       return;
     }
 
@@ -127,8 +146,8 @@ export function Login(): JSX.Element {
           </section>
           <section className="locations locations--login locations--current">
             <div className="locations__item">
-              <a className="locations__item-link" href="#">
-                <span>Amsterdam</span>
+              <a className="locations__item-link" href="#" onClick={handleQuickCityClick}>
+                <span>{randomCity}</span>
               </a>
             </div>
           </section>

@@ -4,10 +4,11 @@ import {OfferType} from '../domain/dto/offer.ts';
 
 interface FavoriteCardProps {
   offer: OfferType;
+  onFavoriteClick?: (offerId: string) => void;
 }
 
-function FavoritePlaceCardComponent({offer}: FavoriteCardProps): JSX.Element {
-  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
+function FavoritePlaceCardComponent({offer, onFavoriteClick}: FavoriteCardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating) * 20}%`, [offer.rating]);
   return (
     <article className="favorites__card place-card">
       {offer.isPremium ? (
@@ -26,7 +27,14 @@ function FavoritePlaceCardComponent({offer}: FavoriteCardProps): JSX.Element {
             <b className="place-card__price-value">&euro;{offer.price}</b>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          <button className="place-card__bookmark-button place-card__bookmark-button--active button" type="button">
+          <button
+            className="place-card__bookmark-button place-card__bookmark-button--active button"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onFavoriteClick?.(offer.id);
+            }}
+          >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use href="#icon-bookmark"></use>
             </svg>
